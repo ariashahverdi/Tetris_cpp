@@ -22,7 +22,9 @@ public:
     Action();
     ~Action();
     void update();
+    void move_down();
     int get_action();
+    
 };
 
 #endif /* action_hpp */

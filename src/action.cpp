@@ -47,5 +47,7 @@ void Action::update(){
     }
 }
 
+void Action::move_down(){action = down;}
+
 int Action::get_action(){return action;}
 

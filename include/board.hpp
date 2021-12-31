@@ -9,14 +9,18 @@
 #include "block.hpp"
 #include "action.hpp"
 
+enum operation { clean, fix };
+
 class Board {
     int _height;
     int _width;
+    int _counter;
     Block * _curr_block_ptr;
     Action *_curr_action;
     std::map<std::tuple<int,int>, const char *> board;
     Board(); // Constructor, make it impossible to call it
-    bool check_move();
+    bool check_move(int);
+    void modify_board(int);
 public:
     Board(int,int);
     ~Board();
@@ -26,9 +30,3 @@ public:
 };
 
 #endif /* board_hpp */
-
-
-/* 
-Have board get a block, update the board by moving the blocks
-and detect the collision in the board!
-*/

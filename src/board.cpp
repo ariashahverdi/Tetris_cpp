@@ -9,13 +9,13 @@ void init_screen(){
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     //attron(A_BLINK);
-
 }
 
 Board::Board(int h, int w) {
     init_screen();
     _height = h;
     _width = w; 
+    _counter = 0;
     _curr_block_ptr = nullptr;
     _curr_action = new Action();
     for(int i = 0; i < _height; i++){
@@ -29,22 +29,14 @@ Board::Board(int h, int w) {
 };
 
 Board::~Board() {endwin();};
-/*
-bool Board::add_block() const {
-    if (_curr_block == nullptr){
-        _curr_block = Block();
-        return true;
-    }
-    return false;
-};
-*/
 
-bool Board::check_move() {
+bool Board::check_move(int action) {
+
     auto coords = _curr_block_ptr->get_coords();
     int x = std::get<0>(coords);
     int y = std::get<1>(coords);
 
-    switch (_curr_action->get_action()) {
+    switch (action) {
         case down:      x++;    break;
         case left:      --y;    break;
         case right:     y++;    break;
@@ -54,23 +46,53 @@ bool Board::check_move() {
 
     for(int i = 0; i < 4; ++i){
         for(int j = 0; j < 4; ++j){
-            if ((x+i >= 0 && x+i < _height - 1) && (y+j >= 0 && y+j < _width)){
-                if (strncmp(board[{x+i,y+j}], "#",1) == 0 && _curr_block_ptr->get_cell(i,j) == 1)return false; 
+            if ((x+i >= 0 && x+i < _height) && (y+j >= 0 && y+j < _width)){
+                if (strncmp(board[{x+i,y+j}], "#",1) == 0 && _curr_block_ptr->get_cell(i,j) == 1) return false; 
             }
         }
     }     
     return true;
 }
 
+void Board::modify_board(int operation){
+    auto coords = _curr_block_ptr->get_coords();
+    int x = std::get<0>(coords);
+    int y = std::get<1>(coords);
+    for(int i = 0; i < 4; ++i){
+        for(int j = 0; j < 4; ++j){
+            if ((x+i >= 0 && x+i < _height - 1) && (y+j >= 0 && y+j < _width)){
+                if (strncmp(board[{x+i,y+j}], "O",1) == 0) {
+                    board[{x+i,y+j}] = operation == clean ? " " : "#";
+                }
+            }
+        }
+    } 
+}
+
+
 bool Board::update(){
+    
     // Get an Action from User and if it is quit then return
     _curr_action->update();
     if (_curr_action->get_action() == quit) {return false;}
+    
     // Check if there is no block in the board then generate one
     if (_curr_block_ptr == nullptr){_curr_block_ptr = new Block();}
+
+    bool flag = false;
+    // If Timeout move the block down
+    if(++_counter%10==0){_counter=0; _curr_action->move_down(); flag = true;}
+
+    int action = _curr_action->get_action();
+
     // Check if moving the block will cause the collision
-    if (check_move()){
-        _curr_block_ptr->update(_curr_action->get_action());
+    if (check_move(action)){
+
+        // Clean the previous block 
+        modify_board(clean);
+
+        // Move the Block
+        _curr_block_ptr->update(action);
         auto coords = _curr_block_ptr->get_coords();
         int x = std::get<0>(coords);
         int y = std::get<1>(coords);
@@ -80,16 +102,21 @@ bool Board::update(){
             }
         } 
     }
+    else if(flag){ // We have to move but we can't so we have to retire the block
+        // Fix the block
+        modify_board(fix);
+
+        // Retire the Previous Block
+        _curr_block_ptr = nullptr;
+    }
 
    return true;
 };
-
 
 std::tuple<int,int> Board::get_size(){
     std::tuple<int, int> size = {_height, _width};
     return size;
 }
-
 
 void Board::draw(){
     mvprintw(0,0,"");
@@ -99,25 +126,3 @@ void Board::draw(){
     }
     refresh(); 
 };
-
-
-
-/*
-int HEIGHT = 20;
-int WIDTH = 20;  
-void board(int x, int y){
-    mvprintw(0,0,"");
-    for(int i = 0; i < HEIGHT; i++)
-    {
-        printw("#");
-        for(int j = 1; j < WIDTH - 1; j++)
-        {
-            if(i == 0 || i == HEIGHT-1) {printw("#");}
-            else if (i == x && j == y){printw("O");}
-            else printw(" ");
-        }
-        printw("#\n"); 
-        refresh();      
-    }
-}
-*/

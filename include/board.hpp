@@ -24,6 +24,7 @@ class Board {
     void modify_board(int);
     std::vector<int> find_and_clear_rows();
     void clear_rows(std::vector<int>);
+    bool check_bounds();
 public:
     Board(int,int);
     ~Board();

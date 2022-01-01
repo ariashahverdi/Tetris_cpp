@@ -35,12 +35,12 @@ void Block::update(int next_action){
     return;
 }
 
+/*
 void Block::move(){
-    //Check if the move is valid
-    //Board(next_action, board)
     ++x_cord;
     return;
 }
+*/
 
 // by 90 degrees in
 // anti-clockwise direction

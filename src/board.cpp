@@ -111,6 +111,11 @@ void Board::clear_rows(std::vector<int> rows){
     }
 }
 
+bool Board::check_bounds(){
+    auto coords = _curr_block_ptr->get_coords();
+    int x = std::get<0>(coords);
+    return (x > 0);
+}
 
 bool Board::update(){
     
@@ -145,11 +150,18 @@ bool Board::update(){
         } 
     }
     else if (flag){ // We have to move but we can't so we have to retire the block
+        
+        //Before fixing the block check if the x value is outof bound!
+        // The game is finished! Show the score etc.
+        if (!check_bounds()) {return false;}
+        
         // Fix the block
         modify_board(fix);
 
         // Retire the Previous Block
         _curr_block_ptr = nullptr;
+
+
 
         auto rows = find_and_clear_rows();
 

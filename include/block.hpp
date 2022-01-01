@@ -16,13 +16,10 @@
 
 enum shapes { I, J, L, O, S, T, Z };
 
-
-
 class Block {
     int shape_idx;
     int x_cord, y_cord;
-    std::map<int, std::vector<std::vector<int>>> block_map = { 
-        //{ U, {{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}} },  
+    std::map<int, std::vector<std::vector<int>>> block_map = {  
         { I, {{0,1,0,0},{0,1,0,0},{0,1,0,0},{0,1,0,0}} },
         { J, {{0,0,1,0},{0,0,1,0},{0,1,1,0},{0,0,0,0}} },
         { L, {{0,1,0,0},{0,1,0,0},{0,1,1,0},{0,0,0,0}} },
@@ -38,7 +35,7 @@ public:
     std::tuple<int, int> get_coords();
     int get_cell(int, int);
     void update(int);
-    void move();
+    //void move();
     void rotate();
     void rotate_revert();
 };

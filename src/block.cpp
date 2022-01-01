@@ -1,7 +1,7 @@
 #include "block.hpp"
 
 //
-Block::Block() : shape_idx(rand()%3), x_cord(-3), y_cord(5) {};
+Block::Block() : shape_idx(rand()%7), x_cord(-3), y_cord(5) {};
 
 Block::~Block() {};
 
@@ -10,12 +10,6 @@ std::tuple<int, int> Block::get_coords(){
 }
 
 int Block::get_cell(int i, int j){
-    std::map<int, std::vector<std::vector<int>>> block_map = { 
-        //{ U, {{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}} },  
-        { I, {{0,1,0,0},{0,1,0,0},{0,1,0,0},{0,1,0,0}} },
-        { J, {{0,0,1,0},{0,0,1,0},{0,1,1,0},{0,0,0,0}} },
-        { L, {{0,1,0,0},{0,1,0,0},{0,1,1,0},{0,0,0,0}} }
-    };
     return block_map[shape_idx][i][j];
 }
 
@@ -24,7 +18,7 @@ void Block::update(int next_action){
     //Board(next_action, board)
     switch (next_action){
         case up:
-            //rotate()
+            rotate();
             break;
         case down:
             ++x_cord;
@@ -48,3 +42,41 @@ void Block::move(){
     return;
 }
 
+// by 90 degrees in
+// anti-clockwise direction
+void rotateMatrix(std::vector<std::vector<int>> & mat, int N)
+{
+    // Consider all squares one by one
+    for (int x = 0; x < N / 2; x++) {
+        // Consider elements in group
+        // of 4 in current square
+        for (int y = x; y < N - x - 1; y++) {
+            // Store current cell in
+            // temp variable
+            int temp = mat[x][y];
+ 
+            // Move values from right to top
+            mat[x][y] = mat[y][N - 1 - x];
+ 
+            // Move values from bottom to right
+            mat[y][N - 1 - x]
+                = mat[N - 1 - x][N - 1 - y];
+ 
+            // Move values from left to bottom
+            mat[N - 1 - x][N - 1 - y]
+                = mat[N - 1 - y][x];
+ 
+            // Assign temp to left
+            mat[N - 1 - y][x] = temp;
+        }
+    }
+}
+
+void Block::rotate(){
+    temp_block = block_map[shape_idx];
+    rotateMatrix(block_map[shape_idx], 4);
+}
+
+void Block::rotate_revert(){
+    block_map[shape_idx] = temp_block;
+}

@@ -8,7 +8,7 @@ void init_screen(){
 	noecho();
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
-    //attron(A_BLINK);
+    attron(A_BLINK);
 }
 
 Board::Board(int h, int w) {
@@ -31,6 +31,9 @@ Board::Board(int h, int w) {
 Board::~Board() {endwin();};
 
 bool Board::check_move(int action) {
+    
+    int flag = true;
+    if (action == up) {_curr_block_ptr->rotate();}
 
     auto coords = _curr_block_ptr->get_coords();
     int x = std::get<0>(coords);
@@ -40,18 +43,19 @@ bool Board::check_move(int action) {
         case down:      x++;    break;
         case left:      --y;    break;
         case right:     y++;    break;
-        case up:        --x;    break;
         default:                break;
     }
 
     for(int i = 0; i < 4; ++i){
         for(int j = 0; j < 4; ++j){
             if ((x+i >= 0 && x+i < _height) && (y+j >= 0 && y+j < _width)){
-                if (strncmp(board[{x+i,y+j}], "#",1) == 0 && _curr_block_ptr->get_cell(i,j) == 1) return false; 
+                if (strncmp(board[{x+i,y+j}], "#",1) == 0 && _curr_block_ptr->get_cell(i,j) == 1) flag = false; 
             }
         }
-    }     
-    return true;
+    } 
+
+    if (action == up) {_curr_block_ptr->rotate_revert();}
+    return flag;
 }
 
 void Board::modify_board(int operation){
@@ -140,7 +144,7 @@ bool Board::update(){
             }
         } 
     }
-    else if(flag){ // We have to move but we can't so we have to retire the block
+    else if (flag){ // We have to move but we can't so we have to retire the block
         // Fix the block
         modify_board(fix);
 
@@ -150,8 +154,6 @@ bool Board::update(){
         auto rows = find_and_clear_rows();
 
         clear_rows(rows);
-
-
     }
 
    return true;
@@ -168,5 +170,6 @@ void Board::draw(){
         for(int j = 0; j < _width; j++) printw(board[{i,j}]);
         printw("\n"); 
     }
+    mvprintw(10,40,"Hi");
     refresh(); 
 };

@@ -69,6 +69,44 @@ void Board::modify_board(int operation){
     } 
 }
 
+std::vector<int> Board::find_and_clear_rows(){
+    std::vector<int> res;
+    bool flag;
+    for(int i = 0; i < _height-1; i++){
+        flag = true;
+        for(int j = 1; j < _width-1; j++){
+            if (strncmp(board[{i,j}], "#",1) != 0) {
+                flag = false;
+                break;
+            }
+        }
+        if (flag) {res.push_back(i);}
+    }  
+
+    //sort in descending order
+    sort(res.begin(), res.end(), std::greater<int>());  
+    for (auto row : res){
+        for(int j = 1; j < _width-1; j++){board[{row,j}] = "=";}
+    }
+    draw();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    return res;
+}
+
+void Board::clear_rows(std::vector<int> rows){
+    int offset = 0;
+    for (auto row : rows){
+        for(int i = row+offset; i >= 0; --i){
+            for(int j = 1; j < _width-1; ++j){
+                board[{i,j}] = (i==0) ? " " : board[{i-1,j}];
+            }
+        }  
+        ++offset;
+        draw();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+}
+
 
 bool Board::update(){
     
@@ -81,7 +119,7 @@ bool Board::update(){
 
     bool flag = false;
     // If Timeout move the block down
-    if(++_counter%10==0){_counter=0; _curr_action->move_down(); flag = true;}
+    if(++_counter%5==0){_counter=0; _curr_action->move_down(); flag = true;}
 
     int action = _curr_action->get_action();
 
@@ -108,6 +146,12 @@ bool Board::update(){
 
         // Retire the Previous Block
         _curr_block_ptr = nullptr;
+
+        auto rows = find_and_clear_rows();
+
+        clear_rows(rows);
+
+
     }
 
    return true;

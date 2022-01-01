@@ -6,6 +6,7 @@
 #include <map>
 #include <tuple>
 #include <ncurses.h>
+#include <thread>
 #include "block.hpp"
 #include "action.hpp"
 
@@ -21,6 +22,8 @@ class Board {
     Board(); // Constructor, make it impossible to call it
     bool check_move(int);
     void modify_board(int);
+    std::vector<int> find_and_clear_rows();
+    void clear_rows(std::vector<int>);
 public:
     Board(int,int);
     ~Board();

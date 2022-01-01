@@ -8,7 +8,7 @@ int main()
 {
     srand (time(NULL));
     int HEIGHT = 20;
-    int WIDTH = 20;
+    int WIDTH = 14;
     Board my_board = Board(HEIGHT,WIDTH);    
     my_board.draw();
     bool status = true;
